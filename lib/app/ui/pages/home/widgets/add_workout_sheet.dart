@@ -1,32 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_application_2/app/controllers/home_controller.dart';
+import 'package:flutter_application_2/app/controllers/add_workout_controller.dart';
 
-class AddWorkoutSheet extends StatefulWidget {
-  @override
-  _AddWorkoutSheetState createState() => _AddWorkoutSheetState();
-}
-
-class _AddWorkoutSheetState extends State<AddWorkoutSheet> {
-  final HomeController controller = Get.find();
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _muscleController = TextEditingController();
-  final _volumeController = TextEditingController();
-  final _setsController = TextEditingController();
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _muscleController.dispose();
-    _volumeController.dispose();
-    _setsController.dispose();
-    super.dispose();
-  }
-
+// 1. Ubah dari GetView<...> menjadi StatelessWidget
+class AddWorkoutSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // 2. Inisialisasi controller di sini.
+    // GetX akan secara otomatis menghapusnya saat sheet ditutup.
+    final AddWorkoutController controller = Get.put(AddWorkoutController());
+
+    // 3. Sisanya sama persis seperti sebelumnya
     return SingleChildScrollView(
       child: Container(
         padding: EdgeInsets.only(
@@ -42,81 +27,113 @@ class _AddWorkoutSheetState extends State<AddWorkoutSheet> {
             topRight: Radius.circular(20),
           ),
         ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Add New Workout",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Add New Workout",
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // --- Search Field ---
+            TextFormField(
+              controller: controller.searchController,
+              onChanged: controller.onSearchChanged,
+              decoration: InputDecoration(
+                labelText: 'Search Exercise (e.g., bench press)',
+                suffixIcon: Obx(
+                  () => controller.isLoading.value
+                      ? const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.search),
                 ),
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Workout Name (e.g., Bench Press)',
+            ),
+            const SizedBox(height: 10),
+
+            // --- Search Results List ---
+            Obx(() {
+              if (controller.searchResults.isEmpty) {
+                return const SizedBox.shrink(); // Kosong jika tidak ada hasil
+              }
+              return Container(
+                height: 150, // Batasi tinggi list
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                validator: (value) => value!.isEmpty ? 'Cannot be empty' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _muscleController,
-                decoration: const InputDecoration(
-                  labelText: 'Muscle Group (e.g., Chest)',
-                ),
-                validator: (value) => value!.isEmpty ? 'Cannot be empty' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _volumeController,
-                decoration: const InputDecoration(
-                  labelText: 'Total Volume (kg)',
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Cannot be empty' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _setsController,
-                decoration: const InputDecoration(labelText: 'Number of Sets'),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Cannot be empty' : null,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Get.theme.colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      controller.addWorkout(
-                        name: _nameController.text,
-                        muscleGroup: _muscleController.text,
-                        totalVolume: double.parse(_volumeController.text),
-                        sets: int.parse(_setsController.text),
-                      );
-                    }
+                child: ListView.builder(
+                  itemCount: controller.searchResults.length,
+                  itemBuilder: (context, index) {
+                    final exercise = controller.searchResults[index];
+                    return ListTile(
+                      title: Text(exercise.name),
+                      subtitle: Text(
+                        exercise.muscle.capitalizeFirst ?? exercise.muscle,
+                      ),
+                      onTap: () {
+                        controller.selectExercise(exercise);
+                      },
+                    );
                   },
-                  child: Text(
-                    'Save Workout',
-                    style: GoogleFonts.poppins(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                ),
+              );
+            }),
+
+            // --- Form Fields (hanya tampil jika exercise sudah dipilih) ---
+            Obx(() {
+              if (controller.selectedExercise.value == null) {
+                return const SizedBox.shrink(); // Kosong jika belum ada yg dipilih
+              }
+              return Column(
+                children: [
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: controller.volumeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Total Volume (kg)',
                     ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: controller.setsController,
+                    decoration: const InputDecoration(
+                      labelText: 'Number of Sets',
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
+              );
+            }),
+
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Get.theme.colorScheme.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                onPressed: controller.saveWorkout, // Panggil method controller
+                child: Text(
+                  'Save Workout',
+                  style: GoogleFonts.poppins(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
