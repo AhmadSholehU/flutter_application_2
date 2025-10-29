@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'firebase_options.dart';
 import 'package:flutter_application_2/app/controllers/auth_controller.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   // Pastikan semua widget Flutter sudah siap
@@ -29,6 +30,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
+
+      // --- 2. TAMBAHKAN PROPERTI DI BAWAH INI ---
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('id'), // Mendukung Bahasa Indonesia
+        Locale('en'), // Mendukung Bahasa Inggris (default)
+      ],
+      // ----------------------------------------
     );
   }
 }

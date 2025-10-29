@@ -8,7 +8,7 @@ class HomeController extends GetxController {
   final FirestoreService _firestoreService = FirestoreService();
   // Membuat list workout menjadi reaktif
   final workouts = <Workout>[].obs;
-
+  var selectedDate = DateTime.now().obs;
   // Getters untuk menghitung total secara otomatis
   // UI akan update jika list workouts berubah
   double get totalVolume =>
@@ -19,7 +19,17 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    workouts.bindStream(_firestoreService.getWorkoutsStream());
+    workouts.bindStream(
+      _firestoreService.getWorkoutsStream(selectedDate.value),
+    );
+    ever(selectedDate, (newDate) {
+      workouts.bindStream(_firestoreService.getWorkoutsStream(newDate));
+    });
+  }
+
+  void changeSelectedDate(DateTime newDate) {
+    // Set tanggal baru. Ini akan memicu listener 'ever' di atas.
+    selectedDate.value = newDate;
   }
 
   Future<void> addWorkout({

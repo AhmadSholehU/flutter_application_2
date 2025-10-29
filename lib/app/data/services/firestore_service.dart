@@ -23,14 +23,38 @@ class FirestoreService {
   }
 
   // Method untuk mengambil semua workout milik user yang sedang login
-  Stream<List<Workout>> getWorkoutsStream() {
+  Stream<List<Workout>> getWorkoutsStream(DateTime selectedDate) {
     final userId = _userId;
-    if (userId == null)
-      return Stream.value([]); // Kembalikan stream kosong jika belum login
+    if (userId == null) return Stream.value([]);
+
+    // Tentukan rentang waktu: dari awal hari (00:00) hingga akhir hari (23:59)
+    DateTime startDate = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      0,
+      0,
+      0,
+    );
+    DateTime endDate = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      23,
+      59,
+      59,
+    );
+
     return _db
         .collection('users')
         .doc(userId)
         .collection('workouts')
+        // Query baru: hanya ambil data di antara rentang waktu
+        .where(
+          'createdAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        )
+        .where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(

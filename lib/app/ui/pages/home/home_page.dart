@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/app/ui/pages/home/widgets/add_workout_sheet.dart';
+import 'package:flutter_application_2/app/ui/pages/home/widgets/date_scroller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_2/app/controllers/home_controller.dart';
 import 'package:flutter_application_2/app/ui/pages/home/widgets/summary_card.dart';
 import 'package:flutter_application_2/app/ui/pages/home/widgets/workout_tile.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Today',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+        title: Obx(
+          () => Text(
+            formatAppBarTitle(controller.selectedDate.value),
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+          ),
         ),
         centerTitle: true,
         elevation: 0,
@@ -27,10 +31,13 @@ class HomePage extends GetView<HomeController> {
         child: const Icon(Icons.add, color: Colors.black),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const DateScroller(),
+
+            const SizedBox(height: 24),
             // --- Bagian Header Total Volume ---
             Text(
               'TOTAL VOLUMES',
@@ -124,5 +131,22 @@ class HomePage extends GetView<HomeController> {
         ),
       ),
     );
+  }
+
+  // --- 3. TAMBAHKAN HELPER METHOD INI ---
+  // Helper untuk memformat judul AppBar
+  String formatAppBarTitle(DateTime date) {
+    final now = DateTime.now();
+    if (date.day == now.day &&
+        date.month == now.month &&
+        date.year == now.year) {
+      return "Today";
+    }
+    if (date.day == now.subtract(const Duration(days: 1)).day &&
+        date.month == now.month) {
+      return "Yesterday";
+    }
+    // Format tanggal lain (misal: "Oct 27")
+    return DateFormat('MMM d').format(date);
   }
 }
