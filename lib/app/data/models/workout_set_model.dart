@@ -6,10 +6,7 @@ class WorkoutSet {
 
   // Method untuk mengubah objek menjadi Map (untuk Firestore)
   Map<String, dynamic> toJson() {
-    return {
-      'reps': reps,
-      'weight': weight,
-    };
+    return {'reps': reps, 'weight': weight};
   }
 
   // Factory untuk membuat objek dari Map (dari Firestore)

@@ -90,25 +90,33 @@ class AddWorkoutSheet extends StatelessWidget {
             // --- Form Fields (hanya tampil jika exercise sudah dipilih) ---
             Obx(() {
               if (controller.selectedExercise.value == null) {
-                return const SizedBox.shrink(); // Kosong jika belum ada yg dipilih
+                return const SizedBox.shrink(); // Sembunyikan jika belum ada exercise
               }
+              // Tampilkan daftar set yang dinamis
               return Column(
                 children: [
                   const SizedBox(height: 12),
-                  TextFormField(
-                    controller: controller.volumeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Total Volume (kg)',
-                    ),
-                    keyboardType: TextInputType.number,
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: controller.setEntries.length,
+                    itemBuilder: (context, index) {
+                      return _buildSetRow(controller, index);
+                    },
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
-                    controller: controller.setsController,
-                    decoration: const InputDecoration(
-                      labelText: 'Number of Sets',
+                  // Tombol "Add Set"
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: controller.addNewSet,
+                      icon: const Icon(Icons.add),
+                      label: const Text("Add Set"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Get.theme.colorScheme.surface,
+                        side: BorderSide(color: Colors.grey[700]!),
+                      ),
                     ),
-                    keyboardType: TextInputType.number,
                   ),
                 ],
               );
@@ -135,6 +143,61 @@ class AddWorkoutSheet extends StatelessWidget {
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSetRow(AddWorkoutController controller, int index) {
+    final entry = controller.setEntries[index];
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Row(
+        children: [
+          // Label Set (misal: "1")
+          Text(
+            "${index + 1}",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Field "Reps"
+          Expanded(
+            child: TextFormField(
+              controller: entry.reps,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Reps",
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Field "Weight (kg)"
+          Expanded(
+            child: TextFormField(
+              controller: entry.weight,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Weight (kg)",
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Tombol Hapus Set
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+            onPressed: () => controller.removeSet(index),
+          ),
+        ],
       ),
     );
   }

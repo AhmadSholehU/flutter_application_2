@@ -3,7 +3,21 @@ import 'package:get/get.dart';
 import 'package:flutter_application_2/app/controllers/home_controller.dart';
 import 'package:flutter_application_2/app/data/models/api_exercise_model.dart';
 import 'package:flutter_application_2/app/data/services/exercise_api_service.dart';
+import 'package:flutter_application_2/app/data/models/workout_set_model.dart';
 import 'dart:async';
+
+// Helper class untuk menampung text controller dari setiap set
+class SetEntryControllers {
+  final TextEditingController reps;
+  final TextEditingController weight;
+
+  SetEntryControllers({required this.reps, required this.weight});
+
+  void dispose() {
+    reps.dispose();
+    weight.dispose();
+  }
+}
 
 class AddWorkoutController extends GetxController {
   final ExerciseApiService _apiService = ExerciseApiService();
@@ -11,9 +25,8 @@ class AddWorkoutController extends GetxController {
   final HomeController _homeController = Get.find<HomeController>();
 
   // Controllers untuk input form
-  final TextEditingController volumeController = TextEditingController();
-  final TextEditingController setsController = TextEditingController();
   final TextEditingController searchController = TextEditingController();
+  var setEntries = <SetEntryControllers>[].obs; // List dinamis untuk set
 
   // State untuk UI
   var isLoading = false.obs;
@@ -24,6 +37,11 @@ class AddWorkoutController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    ever(selectedExercise, (exercise) {
+      if (exercise != null && setEntries.isEmpty) {
+        addNewSet();
+      }
+    });
   }
 
   void onSearchChanged(String query) {
@@ -65,23 +83,57 @@ class AddWorkoutController extends GetxController {
     searchResults.clear();
   }
 
+  void addNewSet() {
+    setEntries.add(
+      SetEntryControllers(
+        reps: TextEditingController(),
+        weight: TextEditingController(),
+      ),
+    );
+  }
+
+  void removeSet(int index) {
+    // Hapus controller dari memori sebelum menghapus dari list
+    setEntries[index].dispose();
+    setEntries.removeAt(index);
+  }
+
   // Method untuk menyimpan workout ke Firebase
   void saveWorkout() {
     if (selectedExercise.value == null) {
       Get.snackbar("Error", "Please select an exercise first.");
       return;
     }
-    if (volumeController.text.isEmpty || setsController.text.isEmpty) {
-      Get.snackbar("Error", "Please fill in volume and sets.");
+    if (setEntries.isEmpty) {
+      Get.snackbar("Error", "Please add at least one set.");
       return;
     }
 
-    // Panggil method addWorkout dari HomeController
+    List<WorkoutSet> setsData = [];
+    try {
+      // Loop melalui setiap text controller dan parse datanya
+      for (var entry in setEntries) {
+        final reps = int.tryParse(entry.reps.text);
+        final weight = double.tryParse(entry.weight.text);
+
+        if (reps == null || weight == null || reps <= 0 || weight < 0) {
+          throw Exception("Invalid data in one of the sets.");
+        }
+        setsData.add(WorkoutSet(reps: reps, weight: weight));
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Please fill all reps and weight fields correctly.",
+      );
+      return;
+    }
+
+    // Panggil method addWorkout dari HomeController dengan data set yang baru
     _homeController.addWorkout(
       name: selectedExercise.value!.name,
       muscleGroup: selectedExercise.value!.muscle,
-      totalVolume: double.parse(volumeController.text),
-      sets: int.parse(setsController.text),
+      sets: setsData,
     );
   }
 
@@ -89,10 +141,10 @@ class AddWorkoutController extends GetxController {
   @override
   void onClose() {
     _debouncer.dispose();
-    volumeController.dispose();
-    setsController.dispose();
     searchController.dispose();
-    Get.delete<RxString>(); // Hapus RxString dari memori
+    for (var entry in setEntries) {
+      entry.dispose();
+    }
     super.onClose();
   }
 }
