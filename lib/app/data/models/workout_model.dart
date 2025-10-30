@@ -11,10 +11,10 @@ class Workout {
 
   // --- PERUBAHAN INTI ---
   // Kita simpan detail dari setiap set
-  final List<WorkoutSet> setDetails;
+  List<WorkoutSet> setDetails;
   // Kita juga simpan data agregat (yang sudah dihitung) agar mudah ditampilkan
-  final double totalVolume;
-  final int sets; // Ini adalah jumlah set (setDetails.length)
+  double totalVolume;
+  int sets; // Ini adalah jumlah set (setDetails.length)
   // -----------------------
 
   Workout({

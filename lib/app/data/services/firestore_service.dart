@@ -62,4 +62,28 @@ class FirestoreService {
               snapshot.docs.map((doc) => Workout.fromFirestore(doc)).toList(),
         );
   }
+
+  // TAMBAHKAN METHOD UNTUK UPDATE
+  Future<void> updateWorkout(String workoutId, Map<String, dynamic> data) {
+    final userId = _userId;
+    if (userId == null) throw Exception("User not logged in");
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('workouts')
+        .doc(workoutId)
+        .update(data);
+  }
+
+  // TAMBAHKAN METHOD UNTUK DELETE
+  Future<void> deleteWorkout(String workoutId) {
+    final userId = _userId;
+    if (userId == null) throw Exception("User not logged in");
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('workouts')
+        .doc(workoutId)
+        .delete();
+  }
 }
