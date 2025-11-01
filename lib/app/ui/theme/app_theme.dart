@@ -15,7 +15,7 @@ class AppTheme {
       iconTheme: const IconThemeData(color: Colors.white),
     ),
     colorScheme: const ColorScheme.dark(
-      primary: Color(0xFFD0FD3E), // Warna aksen utama (hijau terang)
+      primary: Color(0xFF2FA98C), // Warna aksen utama (hijau terang)
       secondary: Colors.white,
       background: Color(0xFF1C1C1E),
       surface: Color(0xFF2C2C2E), // Warna untuk card

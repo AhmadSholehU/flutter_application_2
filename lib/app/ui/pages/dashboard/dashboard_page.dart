@@ -23,10 +23,10 @@ class DashboardPage extends GetView<DashboardController> {
           currentIndex: controller.tabIndex.value,
           type: BottomNavigationBarType.fixed,
           backgroundColor: Color(0xFF1C1C1E),
-          selectedItemColor: Color(0xFFD0FD3E), // Warna item aktif
+          selectedItemColor: Get.theme.colorScheme.primary,
           unselectedItemColor: Colors.grey,
-          selectedLabelStyle: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-          unselectedLabelStyle: GoogleFonts.poppins(),
+          selectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: GoogleFonts.inter(),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_filled),

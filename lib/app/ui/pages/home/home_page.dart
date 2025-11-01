@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/app/ui/pages/home/widgets/add_consumption_sheet.dart';
 import 'package:flutter_application_2/app/ui/pages/home/widgets/add_workout_sheet.dart';
+import 'package:flutter_application_2/app/ui/pages/home/widgets/consumption_card.dart';
 import 'package:flutter_application_2/app/ui/pages/home/widgets/date_scroller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,8 +66,9 @@ class HomePage extends GetView<HomeController> {
                     child: SummaryCard(
                       title: 'Workouts',
                       value: controller.workouts.length.toString(),
-                      icon: Icons.fitness_center,
-                      color: Colors.orangeAccent,
+                      icon: 'assets/icons/ic_wo.svg',
+                      backgroundColor: const Color(0xFF2C2C2E),
+                      iconColor: Colors.redAccent,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -73,8 +76,11 @@ class HomePage extends GetView<HomeController> {
                     child: SummaryCard(
                       title: 'Sets',
                       value: controller.totalSets.toString(),
-                      icon: Icons.repeat,
-                      color: Colors.blueAccent,
+                      icon: 'assets/icons/ic_set.svg',
+                      backgroundColor: const Color(
+                        0xFF2C2C2E,
+                      ), // Warna abu gelap
+                      iconColor: Colors.amber,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -82,19 +88,37 @@ class HomePage extends GetView<HomeController> {
                     child: SummaryCard(
                       title: 'Reps',
                       value: controller.totalReps.toString(),
-                      icon: Icons.tag,
-                      color: Colors.greenAccent,
+                      icon: 'assets/icons/ic_rep.svg',
+                      backgroundColor: const Color(
+                        0xFF2C2C2E,
+                      ), // Warna abu gelap
+                      iconColor: Colors.lightGreenAccent,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 30),
-
+            Text(
+              'TODAY\'S CONSUMPTION',
+              style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () {
+                // Tampilkan bottom sheet saat diklik
+                Get.bottomSheet(
+                  AddConsumptionSheet(),
+                  isScrollControlled: true,
+                );
+              },
+              child: const ConsumptionCard(),
+            ),
+            const SizedBox(height: 30),
             // --- Bagian Daftar Latihan ---
             Text(
               'TODAY\'S WORKOUTS',
-              style: GoogleFonts.poppins(color: Colors.grey, fontSize: 12),
+              style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
             ),
             const SizedBox(height: 16),
             Obx(() {
