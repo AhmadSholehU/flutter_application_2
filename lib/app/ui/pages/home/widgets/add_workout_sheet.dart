@@ -43,7 +43,7 @@ class AddWorkoutSheet extends StatelessWidget {
             // --- Search Field ---
             TextFormField(
               controller: controller.searchController,
-              onChanged: controller.onSearchChanged,
+
               decoration: InputDecoration(
                 labelText: 'Search Exercise (e.g., bench press)',
                 suffixIcon: Obx(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_2/app/controllers/nutrition_controller.dart';
-import 'package:flutter_application_2/app/ui/pages/home/widgets/add_consumption_sheet.dart'; // Akan kita buat
 
 class ConsumptionCard extends GetView<NutritionController> {
   const ConsumptionCard({Key? key}) : super(key: key);
@@ -12,7 +11,7 @@ class ConsumptionCard extends GetView<NutritionController> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2E),
+        color: const Color(0xFF232d37).withOpacity(0.7),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(

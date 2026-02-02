@@ -1,34 +1,26 @@
+import 'package:flutter_application_2/app/data/constant/constants.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_application_2/app/data/models/api_exercise_model.dart';
+import 'dart:convert';
 
 class ExerciseApiService {
-  static const String _baseUrl = 'https://api.api-ninjas.com/v1/exercises';
+  Future<Map<String, dynamic>> getExercises({
+    String? after,
+    String? query,
+  }) async {
+    final Map<String, String> queryParams = {
+      'limit': '10',
+      if (after != null && after.isNotEmpty) 'after': after, // Parameter cursor
+      if (query != null && query.isNotEmpty) 'bodyParts': query,
+    };
 
-  // GANTI DENGAN API KEY ANDA YANG SEBENARNYA
-  static const String _apiKey = 'WXHNixkWnzfwDt788KwmSQ==TiyqAmEbtpAYlIYJ';
-
-  Future<List<ApiExercise>> searchExercisesByName(String nameQuery) async {
-    // Jika query kosong, kembalikan list kosong
-    if (nameQuery.isEmpty) {
-      return [];
+    final uri = Uri.parse(
+      ApiConstants.baseUrl,
+    ).replace(queryParameters: queryParams);
+    final response = await http.get(uri, headers: ApiConstants.headers);
+    print('request URL :$uri');
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
     }
-
-    final uri = Uri.parse('$_baseUrl?name=$nameQuery');
-
-    try {
-      final response = await http.get(uri, headers: {'X-Api-Key': _apiKey});
-
-      if (response.statusCode == 200) {
-        // Jika sukses, parse JSON dan kembalikan list
-        return apiExerciseFromJson(response.body);
-      } else {
-        // Jika gagal, lempar exception
-        throw Exception(
-          'Failed to load exercises (Status code: ${response.statusCode})',
-        );
-      }
-    } catch (e) {
-      throw Exception('Failed to load exercises: $e');
-    }
+    throw Exception('Gagal memuat data API');
   }
 }

@@ -22,7 +22,7 @@ class WorkoutTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF2C2C2E),
+          color: const Color(0xFF232d37).withOpacity(0.7),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(

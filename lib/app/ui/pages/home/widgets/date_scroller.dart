@@ -51,7 +51,7 @@ class DateScroller extends GetView<HomeController> {
         height: double.infinity,
         margin: const EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
-          color: Get.theme.colorScheme.surface,
+          color: const Color(0xFF232d37).withOpacity(0.7),
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Icon(
@@ -113,7 +113,7 @@ class DateScroller extends GetView<HomeController> {
           decoration: BoxDecoration(
             color: isSelected
                 ? Get.theme.colorScheme.primary
-                : Get.theme.colorScheme.surface,
+                : const Color(0xFF232d37).withOpacity(0.7),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_application_2/app/controllers/home_controller.dart';
 import 'package:flutter_application_2/app/data/models/api_exercise_model.dart';
-import 'package:flutter_application_2/app/data/services/exercise_api_service.dart';
 import 'package:flutter_application_2/app/data/models/workout_set_model.dart';
 import 'dart:async';
 
@@ -20,7 +19,6 @@ class SetEntryControllers {
 }
 
 class AddWorkoutController extends GetxController {
-  final ExerciseApiService _apiService = ExerciseApiService();
   // Temukan HomeController yang sudah ada untuk menyimpan data
   final HomeController _homeController = Get.find<HomeController>();
 
@@ -44,12 +42,12 @@ class AddWorkoutController extends GetxController {
     });
   }
 
-  void onSearchChanged(String query) {
-    // Jalankan pencarian menggunakan debouncer
-    _debouncer.run(() {
-      _fetchExercises(query);
-    });
-  }
+  // void onSearchChanged(String query) {
+  //   // Jalankan pencarian menggunakan debouncer
+  //   _debouncer.run(() {
+  //     _fetchExercises(query);
+  //   });
+  // }
 
   // Mendaftarkan RxString untuk debounce di atas
   @override
@@ -60,21 +58,21 @@ class AddWorkoutController extends GetxController {
   }
 
   // Method untuk mencari exercise
-  Future<void> _fetchExercises(String query) async {
-    if (query.length < 3) {
-      searchResults.clear();
-      return;
-    }
-    isLoading.value = true;
-    try {
-      final results = await _apiService.searchExercisesByName(query);
-      searchResults.assignAll(results);
-    } catch (e) {
-      Get.snackbar("Error", "Failed to fetch exercises: ${e.toString()}");
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  // Future<void> _fetchExercises(String query) async {
+  //   if (query.length < 3) {
+  //     searchResults.clear();
+  //     return;
+  //   }
+  //   isLoading.value = true;
+  //   try {
+  //     final results = await _apiService.searchExercisesByName(query);
+  //     searchResults.assignAll(results);
+  //   } catch (e) {
+  //     Get.snackbar("Error", "Failed to fetch exercises: ${e.toString()}");
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
   // Method saat user memilih exercise dari hasil pencarian
   void selectExercise(ApiExercise exercise) {
