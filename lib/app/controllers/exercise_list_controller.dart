@@ -1,37 +1,42 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/app/data/models/exercise_model.dart';
-import 'package:flutter_application_2/app/data/services/exercise_api_service.dart';
+import 'package:flutter_application_2/app/data/repositories/exercise_repository.dart';
 import 'package:get/get.dart';
 
 class ExerciseListController extends GetxController {
-  final ExerciseApiService _apiService = ExerciseApiService();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // Inisialisasi Repository
+  final ExerciseRepository _repository;
 
-  var defaultExercises = <Exercise>[].obs;
+  ExerciseListController(this._repository);
+
   var exercises = <Exercise>[].obs;
   var isLoading = false.obs;
   var isMoreLoading = false.obs;
-  var currentOffset = 0;
   var hasMore = true.obs;
-  var currentQuery = "".obs;
-  String? nextCursor;
+
+  // Variabel untuk menyimpan kursor pagination
+  DocumentSnapshot? _lastDocument;
 
   final ScrollController scrollController = ScrollController();
   Timer? _debounce;
+  var currentQuery = "".obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchInitialData();
+    fetchExercises(); // Panggil fetch awal
 
-    // Listener untuk Infinite Scroll
+    // Listener Infinite Scroll
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
           scrollController.position.maxScrollExtent - 200) {
-        if (hasMore.value && !isMoreLoading.value && !isLoading.value) {
+        // Cek kondisi sebelum load more
+        if (hasMore.value &&
+            !isMoreLoading.value &&
+            !isLoading.value &&
+            currentQuery.isEmpty) {
           loadMore();
         }
       }
@@ -42,61 +47,67 @@ class ExerciseListController extends GetxController {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       currentQuery.value = query;
-      fetchInitialData(query: query);
+      fetchExercises(query: query);
     });
   }
 
-  void fetchInitialData({String query = ""}) async {
+  // Fungsi Fetch Data Utama (Reset List)
+  Future<void> fetchExercises({String query = ""}) async {
     isLoading.value = true;
-    currentOffset = 0;
-    nextCursor = null;
-    currentQuery.value = query;
+    _lastDocument = null; // Reset kursor saat refresh/search
     hasMore.value = true;
 
     try {
-      if (query.isEmpty) {
-        final snapshot = await _firestore.collection('default_exercises').get();
-        defaultExercises.assignAll(
-          snapshot.docs
-              .map((doc) => Exercise.fromJson(doc.data(), docId: doc.id))
-              .toList(),
-        );
+      if (query.isNotEmpty) {
+        // Mode Search (Langsung ambil semua hasil yang cocok)
+        final result = await _repository.searchExercises(query);
+        exercises.assignAll(result);
+        hasMore.value = false; // Disable load more saat searching
       } else {
-        defaultExercises.clear(); // Bersihkan default saat user mulai mencari
-      }
-      final result = await _apiService.getExercises(after: null, query: query);
-      if (result['success'] == true) {
-        final List dataList = result['data'] ?? [];
-        exercises.assignAll(dataList.map((e) => Exercise.fromJson(e)).toList());
+        // Mode List Normal (Pakai Pagination)
+        final result = await _repository.getExercises(limit: 15);
+        exercises.assignAll(result.data);
+        _lastDocument = result.lastDocument;
 
-        final meta = result['meta'];
-        hasMore.value = meta['hasNextPage'] ?? false;
-        nextCursor =
-            meta['nextCursor']; // Simpan cursor untuk loadMore berikutnya
+        // Jika data yang didapat kurang dari limit, berarti sudah habis
+        if (result.data.length < 15) {
+          hasMore.value = false;
+        }
       }
+    } catch (e) {
+      print("Error: $e");
+      Get.snackbar("Error", "Gagal memuat data latihan");
     } finally {
       isLoading.value = false;
     }
   }
 
-  void loadMore() async {
-    if (isMoreLoading.value || !hasMore.value || nextCursor == null) return;
+  // Fungsi Load More (Append Data)
+  Future<void> loadMore() async {
+    if (isMoreLoading.value || !hasMore.value || _lastDocument == null) return;
+
     isMoreLoading.value = true;
 
     try {
-      final result = await _apiService.getExercises(
-        after: nextCursor, // Kirim cursor yang disimpan sebelumnya
-        query: currentQuery.value,
+      // Panggil repo dengan menyertakan dokumen terakhir
+      final result = await _repository.getExercises(
+        limit: 15,
+        startAfter: _lastDocument,
       );
 
-      if (result['success'] == true) {
-        final List dataList = result['data'] ?? [];
-        exercises.addAll(dataList.map((e) => Exercise.fromJson(e)).toList());
-
-        final meta = result['meta'];
-        hasMore.value = meta['hasNextPage'] ?? false;
-        nextCursor = meta['nextCursor']; // Perbarui cursor terbaru
+      if (result.data.isNotEmpty) {
+        exercises.addAll(result.data); // Tambahkan ke list bawah
+        _lastDocument = result.lastDocument; // Update kursor baru
+      } else {
+        hasMore.value = false; // Data habis total
       }
+
+      // Double check jika data fetch terakhir lebih sedikit dari limit
+      if (result.data.length < 15) {
+        hasMore.value = false;
+      }
+    } catch (e) {
+      print("Error loading more: $e");
     } finally {
       isMoreLoading.value = false;
     }

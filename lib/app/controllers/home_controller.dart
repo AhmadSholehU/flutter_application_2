@@ -1,45 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/app/data/services/firestore_service.dart';
 import 'package:get/get.dart';
 import 'package:flutter_application_2/app/data/models/workout_model.dart';
 import 'package:flutter_application_2/app/data/models/workout_set_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+// Import repository
+import 'package:flutter_application_2/app/data/repositories/workout_repository.dart';
 
 class HomeController extends GetxController {
-  final FirestoreService _firestoreService = FirestoreService();
-  // Membuat list workout menjadi reaktif
+  // 1. Ganti FirestoreService dengan Repository
+  final WorkoutRepository _workoutRepository;
+
+  // 2. Inject via Constructor
+  HomeController(this._workoutRepository);
+
   final workouts = <Workout>[].obs;
   var selectedDate = DateTime.now().obs;
-  // Getters untuk menghitung total secara otomatis
-  // UI akan update jika list workouts berubah
+
   double get totalVolume =>
       workouts.fold(0, (sum, item) => sum + item.totalVolume);
   int get totalSets => workouts.fold(0, (sum, item) => sum + item.sets);
-  int get totalReps => totalSets * 8; // Asumsi 8 repetisi per set
+  int get totalReps => totalSets * 8;
 
   @override
   void onInit() {
     super.onInit();
+    // Gunakan repository untuk stream data
     workouts.bindStream(
-      _firestoreService.getWorkoutsStream(selectedDate.value),
+      _workoutRepository.getWorkoutsStream(selectedDate.value),
     );
     ever(selectedDate, (newDate) {
-      workouts.bindStream(_firestoreService.getWorkoutsStream(newDate));
+      workouts.bindStream(_workoutRepository.getWorkoutsStream(newDate));
     });
   }
 
   void changeSelectedDate(DateTime newDate) {
-    // Set tanggal baru. Ini akan memicu listener 'ever' di atas.
     selectedDate.value = newDate;
   }
 
   Future<void> addWorkout({
     required String name,
     required String muscleGroup,
-    required List<WorkoutSet> sets, // Terima List<WorkoutSet>
+    required List<WorkoutSet> sets,
   }) async {
     try {
-      // Lakukan kalkulasi di sini
       int setCount = sets.length;
       double totalVolume = sets.fold(
         0.0,
@@ -49,14 +52,16 @@ class HomeController extends GetxController {
       final newWorkout = Workout(
         name: name,
         muscleGroup: muscleGroup,
-        setDetails: sets, // Simpan detail set
-        totalVolume: totalVolume, // Simpan total volume kalkulasi
-        sets: setCount, // Simpan jumlah set
+        setDetails: sets,
+        totalVolume: totalVolume,
+        sets: setCount,
         indicatorColor: Colors.primaries[setCount % Colors.primaries.length],
         createdAt: Timestamp.now(),
       );
 
-      await _firestoreService.addWorkout(newWorkout);
+      // Gunakan repository untuk menyimpan
+      await _workoutRepository.addWorkout(newWorkout);
+
       Get.back(); // Tutup bottom sheet
       Get.snackbar(
         "Success",

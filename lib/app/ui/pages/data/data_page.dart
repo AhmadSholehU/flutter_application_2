@@ -7,9 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class DataPage extends StatelessWidget {
-  final DataController controller = Get.put(DataController());
-
+class DataPage extends GetView<DataController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

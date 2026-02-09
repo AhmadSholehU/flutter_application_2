@@ -16,4 +16,17 @@ class WorkoutSet {
       weight: (json['weight'] as num).toDouble(),
     );
   }
+
+  // Convert ke Map
+  Map<String, dynamic> toMap() {
+    return {'reps': reps, 'weight': weight};
+  }
+
+  // Convert dari Map
+  factory WorkoutSet.fromMap(Map<String, dynamic> map) {
+    return WorkoutSet(
+      reps: map['reps'] ?? 0,
+      weight: (map['weight'] ?? 0).toDouble(),
+    );
+  }
 }

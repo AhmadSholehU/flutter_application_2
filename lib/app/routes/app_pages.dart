@@ -1,5 +1,9 @@
 import 'package:flutter_application_2/app/ui/pages/auth/login_page.dart';
 import 'package:flutter_application_2/app/ui/pages/auth/splash_page.dart';
+import 'package:flutter_application_2/app/ui/pages/data/data_binding.dart';
+import 'package:flutter_application_2/app/ui/pages/data/data_page.dart';
+import 'package:flutter_application_2/app/ui/pages/exercise/exercise_list_binding.dart';
+import 'package:flutter_application_2/app/ui/pages/exercise/exercise_list_page.dart';
 import 'package:get/get.dart';
 import 'package:flutter_application_2/app/ui/pages/dashboard/dashboard_binding.dart';
 import 'package:flutter_application_2/app/ui/pages/dashboard/dashboard_page.dart';
@@ -30,6 +34,19 @@ class AppPages {
       page: () => WorkoutDetailPage(),
       binding: WorkoutDetailBinding(),
       transition: Transition.rightToLeftWithFade, // Transisi estetik
+    ),
+
+    GetPage(
+      name: '/exercise-list', // Sesuaikan dengan nama route Anda
+      page: () => ExerciseListPage(),
+      binding: ExerciseListBinding(), // <--- PASANG BINDING DI SINI
+    ),
+
+    GetPage(
+      name:
+          '/data', // Sesuaikan nama route Anda (misal '/analytics' atau '/data')
+      page: () => DataPage(),
+      binding: DataBinding(), // <--- Tambahkan ini
     ),
   ];
 }

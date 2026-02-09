@@ -61,4 +61,37 @@ class Workout {
           .toList(),
     );
   }
+
+  // 1. Convert Object -> Map (untuk Simpan ke Firebase)
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'muscleGroup': muscleGroup,
+      'createdAt': createdAt,
+      // Color disimpan sebagai integer (ARGB)
+      'indicatorColor': indicatorColor.value,
+      'totalVolume': totalVolume,
+      'sets': sets,
+      // List<WorkoutSet> harus diubah jadi List<Map>
+      'setDetails': setDetails.map((s) => s.toMap()).toList(),
+    };
+  }
+
+  // 2. Convert Map -> Object (untuk Baca dari Firebase)
+  factory Workout.fromMap(Map<String, dynamic> map, {String? docId}) {
+    return Workout(
+      id: docId ?? '',
+      name: map['name'] ?? '',
+      muscleGroup: map['muscleGroup'] ?? '',
+      createdAt: map['createdAt'] ?? Timestamp.now(),
+      // Ambil integer dan ubah jadi Color
+      indicatorColor: Color(map['indicatorColor'] ?? 0xFF4AD0B2),
+      totalVolume: (map['totalVolume'] ?? 0).toDouble(),
+      sets: map['sets'] ?? 0,
+      // Ubah List<Map> kembali jadi List<WorkoutSet>
+      setDetails: (map['setDetails'] as List<dynamic>? ?? [])
+          .map((item) => WorkoutSet.fromMap(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
