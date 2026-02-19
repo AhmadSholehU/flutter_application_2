@@ -10,59 +10,74 @@ class WorkoutDetailPage extends GetView<WorkoutDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- Header: Nama & Grup Otot ---
-            Text(
-              controller.workout.muscleGroup.capitalizeFirst ?? '',
-              style: GoogleFonts.poppins(
-                color: Colors.grey,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              controller.workout.name,
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              DateFormat(
-                'EEEE, d MMMM y',
-              ).format(controller.workout.createdAt.toDate()),
-              style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
-            ),
-            const SizedBox(height: 24),
+      // Bungkus dengan Container bergradien agar identik dengan DataPage
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1A2A3A), // Biru tua di atas
+              Color(0xFF121212), // Hitam di bawah
+            ],
+          ),
+        ),
+        child: Scaffold(
+          appBar: _buildAppBar(),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // --- Header: Nama & Grup Otot ---
+                Text(
+                  controller.workout.muscleGroup.capitalizeFirst ?? '',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  controller.workout.name,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  DateFormat(
+                    'EEEE, d MMMM y',
+                  ).format(controller.workout.createdAt.toDate()),
+                  style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
+                ),
+                const SizedBox(height: 24),
 
-            // --- Stat Rangkuman (Estetik) ---
-            _buildStatCards(),
+                // --- Stat Rangkuman (Estetik) ---
+                _buildStatCards(),
 
-            const SizedBox(height: 24),
-            Divider(color: Colors.grey[800]),
-            const SizedBox(height: 16),
+                const SizedBox(height: 24),
+                Divider(color: Colors.grey[800]),
+                const SizedBox(height: 16),
 
-            // --- Bagian Detail Set (Dinamis) ---
-            Text(
-              "SET DETAILS",
-              style: GoogleFonts.poppins(color: Colors.grey, fontSize: 12),
+                // --- Bagian Detail Set (Dinamis) ---
+                Text(
+                  "SET DETAILS",
+                  style: GoogleFonts.poppins(color: Colors.grey, fontSize: 12),
+                ),
+                const SizedBox(height: 16),
+                Obx(() {
+                  // Tampilan berubah berdasarkan mode isEditing
+                  if (controller.isEditing.value) {
+                    return _buildEditView();
+                  } else {
+                    return _buildReadView();
+                  }
+                }),
+              ],
             ),
-            const SizedBox(height: 16),
-            Obx(() {
-              // Tampilan berubah berdasarkan mode isEditing
-              if (controller.isEditing.value) {
-                return _buildEditView();
-              } else {
-                return _buildReadView();
-              }
-            }),
-          ],
+          ),
         ),
       ),
     );

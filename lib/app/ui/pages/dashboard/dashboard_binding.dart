@@ -21,18 +21,21 @@ class DashboardBinding extends Bindings {
     // 2. Inject HomeController dengan Repository di dalamnya
     Get.lazyPut<HomeController>(
       () => HomeController(Get.find<WorkoutRepository>()),
+      fenix: true,
     );
 
     // --- ANALYTICS / DATA TAB DEPENDENCIES (Perbaikan Error 1) ---
     Get.lazyPut<AnalyticsRepository>(() => AnalyticsRepositoryImpl());
     Get.lazyPut<DataController>(
       () => DataController(Get.find<AnalyticsRepository>()),
+      fenix: true,
     );
 
     // --- EXERCISE LIST TAB DEPENDENCIES (Perbaikan Error 2) ---
     Get.lazyPut<ExerciseRepository>(() => ExerciseRepositoryImpl());
     Get.lazyPut<ExerciseListController>(
       () => ExerciseListController(Get.find<ExerciseRepository>()),
+      fenix: true,
     );
   }
 }

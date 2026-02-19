@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/app/routes/app_pages.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter_application_2/app/ui/theme/app_theme.dart';
@@ -14,6 +15,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Inisialisasi Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Inisialisasi env
+  await dotenv.load(fileName: ".env");
   Get.put(AuthController(), permanent: true);
   runApp(const MyApp());
 }
