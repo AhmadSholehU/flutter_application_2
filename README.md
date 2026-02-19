@@ -1,16 +1,56 @@
-# flutter_application_2
+# 📱 MyFitApp (Aplikasi untuk tracking progress gym)
 
-A new Flutter project.
+Aplikasi mobile untuk melakukan **monitoring progress gym**.  
+Dibangun dengan **Flutter** dan **Firebase database**.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 Features
+- Mencatat progress harian gym termasuk jumlah kalori dan protein harian yang dikonsumsi
+- Daftar latihan populer dengan gif image untuk memudahkan pengguna meniru gerakan fitness yang sesuai
+- Analisis progress baik harian maupun mingguan
+- Melihat personal record mingguan
+- Integrasi dengan gemini ai, untuk pengguna bertanya seputar fitness (on progress)
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🖼️ Screenshot
+<p align="center">
+  <img src="myfitapp/ss1.png" alt="Home Screen" width="250"/>
+  <img src="myfitapp/ss2.png" alt="Analisis Screen" width="250"/>
+  <img src="myfitapp/ss3.png" alt="Chat Screen" width="250"/>
+  <img src="myfitapp/ss4.png" alt="Exercise Screen" width="250"/>
+  <img src="myfitapp/ss5.png" alt="Add Screen" width="250"/>
+</p>
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🎥 Demo Video
+<p align="center">
+  <a href="https://youtu.be/GISUEjKLQgA?si=GXELMpv2vnO7fnUN" target="_blank">
+    <img src="https://i.ytimg.com/vi/GISUEjKLQgA/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDT4yJySifnLhGGHwPCfKrAjrJwyw" 
+         alt="Demo Video" width="480"/>
+  </a>
+</p>
+
+---
+
+## ⚙️ Tech Stack
+- **Frontend (Mobile)**: Flutter
+- **Database**: Firebase
+
+---
+
+## 📦 Installation
+```bash
+# Clone repository
+git clone https://github.com/AhmadSholehU/flutter_application_2.git
+
+# Masuk ke folder project
+cd flutter_application_2
+```
+
+---
+
+## 👨‍💻 Author
+- [Hendi Ahmad](https://github.com/AhmadSholehU)

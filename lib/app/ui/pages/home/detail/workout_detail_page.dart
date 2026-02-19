@@ -23,6 +23,7 @@ class WorkoutDetailPage extends GetView<WorkoutDetailController> {
           ),
         ),
         child: Scaffold(
+          backgroundColor: Colors.transparent,
           appBar: _buildAppBar(),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
@@ -86,6 +87,7 @@ class WorkoutDetailPage extends GetView<WorkoutDetailController> {
   // AppBar yang dinamis
   AppBar _buildAppBar() {
     return AppBar(
+      backgroundColor: Colors.transparent,
       title: Obx(
         () => Text(
           controller.isEditing.value ? "Edit Workout" : "Workout Detail",
@@ -258,7 +260,7 @@ class WorkoutDetailPage extends GetView<WorkoutDetailController> {
                 title: 'Total Volume',
                 value: "${controller.workout.totalVolume.toStringAsFixed(0)}kg",
                 icon: 'assets/icons/ic_wo.svg',
-                backgroundColor: const Color(0xFF2C2C2E),
+                backgroundColor: const Color(0xFF232D37).withOpacity(0.7),
                 iconColor: Colors.redAccent,
               ),
             ),
@@ -268,7 +270,7 @@ class WorkoutDetailPage extends GetView<WorkoutDetailController> {
                 title: 'Total Sets',
                 value: controller.workout.sets.toString(),
                 icon: 'assets/icons/ic_set.svg',
-                backgroundColor: const Color(0xFF2C2C2E),
+                backgroundColor: const Color(0xFF232D37).withOpacity(0.7),
                 iconColor: Colors.orangeAccent,
               ),
             ),
@@ -278,7 +280,7 @@ class WorkoutDetailPage extends GetView<WorkoutDetailController> {
                 title: 'Avg Reps',
                 value: avgReps.toStringAsFixed(1),
                 icon: 'assets/icons/ic_rep.svg',
-                backgroundColor: const Color(0xFF2C2C2E),
+                backgroundColor: const Color(0xFF232D37).withOpacity(0.7),
                 iconColor: Colors.greenAccent,
               ),
             ),

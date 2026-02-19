@@ -12,6 +12,7 @@ class ExerciseListBinding extends Bindings {
     // 2. Inject Controller, dan masukkan Repository yang sudah di-inject di atas
     Get.lazyPut<ExerciseListController>(
       () => ExerciseListController(Get.find<ExerciseRepository>()),
+      fenix: true,
     );
   }
 }

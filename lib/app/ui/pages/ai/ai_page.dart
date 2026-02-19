@@ -10,34 +10,48 @@ class AiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1E),
-      appBar: AppBar(
-        title: Text(
-          "AI Coach",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Obx(
-              () => ListView.builder(
-                padding: const EdgeInsets.all(20),
-                itemCount: controller.messages.length,
-                itemBuilder: (context, index) {
-                  final msg = controller.messages[index];
-                  bool isUser = msg['role'] == 'user';
-                  return _buildChatBubble(msg['message']!, isUser);
-                },
-              ),
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1A2A3A), // Biru tua
+              Color(0xFF121212), // Hitam
+            ],
           ),
-          if (controller.isLoading.value)
-            const LinearProgressIndicator(color: Colors.blueAccent),
-          _buildInputArea(),
-        ],
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text(
+              "AI Coach",
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: Obx(
+                  () => ListView.builder(
+                    padding: const EdgeInsets.all(20),
+                    itemCount: controller.messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = controller.messages[index];
+                      bool isUser = msg['role'] == 'user';
+                      return _buildChatBubble(msg['message']!, isUser);
+                    },
+                  ),
+                ),
+              ),
+              if (controller.isLoading.value)
+                const LinearProgressIndicator(color: Colors.blueAccent),
+              _buildInputArea(),
+            ],
+          ),
+        ),
       ),
     );
   }
