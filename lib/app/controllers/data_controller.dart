@@ -44,7 +44,7 @@ class DataController extends GetxController {
     isLoading.value = true;
     try {
       // 1. Ambil Data Harian & Raw Docs (28 hari terakhir untuk trend mingguan)
-      final analyticsData = await _analyticsRepository.getDailyData(28);
+      final analyticsData = await _analyticsRepository.getAllAnalyticsData();
 
       // A. Proses Chart Harian (7 Hari Terakhir)
       _processDailyChart(analyticsData.dailyVolumes);

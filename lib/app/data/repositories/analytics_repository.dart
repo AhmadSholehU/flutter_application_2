@@ -2,12 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
-// Kita buat model return sederhana untuk data analitik agar terstruktur
 class AnalyticsData {
   final Map<String, double> dailyVolumes;
   final Map<String, double> muscleSplit;
-  final List<QueryDocumentSnapshot>
-  rawDocs; // Untuk diproses lebih lanjut jika perlu (heatmap/trend)
+  final List<QueryDocumentSnapshot> rawDocs;
 
   AnalyticsData({
     required this.dailyVolumes,
@@ -17,7 +15,8 @@ class AnalyticsData {
 }
 
 abstract class AnalyticsRepository {
-  Future<AnalyticsData> getDailyData(int daysBack);
+  // 1. Ubah nama fungsi dan hapus parameter daysBack
+  Future<AnalyticsData> getAllAnalyticsData();
   Future<List<Map<String, dynamic>>> getPersonalRecords(int daysBack);
 }
 
@@ -28,43 +27,33 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   String get _userId => _auth.currentUser?.uid ?? '';
 
   @override
-  Future<AnalyticsData> getDailyData(int daysBack) async {
+  Future<AnalyticsData> getAllAnalyticsData() async {
     if (_userId.isEmpty) {
       return AnalyticsData(dailyVolumes: {}, muscleSplit: {}, rawDocs: []);
     }
 
-    DateTime now = DateTime.now();
-    DateTime pastDate = DateTime(now.year, now.month, now.day - (daysBack - 1));
-
     try {
+      // 2. Hapus filter where('createdAt') untuk mengambil SEMUA data
       final snapshot = await _firestore
           .collection('users')
           .doc(_userId)
           .collection('workouts')
-          .where(
-            'createdAt',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(pastDate),
-          )
           .orderBy('createdAt', descending: false)
           .get();
 
-      // Proses data dasar di sini agar controller terima data matang
       Map<String, double> dayMap = {};
       Map<String, double> muscleMap = {};
-
-      // Inisialisasi map tanggal kosong (agar grafik tidak bolong)
-      // Note: Ini opsional, bisa juga dilakukan di controller untuk logika UI view
 
       for (var doc in snapshot.docs) {
         final data = doc.data();
         DateTime date = (data['createdAt'] as Timestamp).toDate();
         String dateKey = DateFormat('yyyy-MM-dd').format(date);
 
-        // Volume Total
+        // Volume Total (Semua Waktu)
         double volume = (data['totalVolume'] ?? 0.0).toDouble();
         dayMap[dateKey] = (dayMap[dateKey] ?? 0.0) + volume;
 
-        // Muscle Split
+        // Muscle Split (Semua Waktu)
         String muscle = data['muscleGroup'] ?? 'General';
         muscleMap[muscle] = (muscleMap[muscle] ?? 0) + 1;
       }
@@ -72,8 +61,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       return AnalyticsData(
         dailyVolumes: dayMap,
         muscleSplit: muscleMap,
-        rawDocs:
-            snapshot.docs, // Kirim raw docs untuk heatmap & trend processing
+        rawDocs: snapshot.docs, // Ini akan berisi SELURUH riwayat latihan
       );
     } catch (e) {
       throw Exception("Gagal mengambil data analitik: $e");
@@ -82,6 +70,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
   @override
   Future<List<Map<String, dynamic>>> getPersonalRecords(int daysBack) async {
+    // ... Logika getPersonalRecords TETAP SAMA seperti sebelumnya
     if (_userId.isEmpty) return [];
 
     DateTime now = DateTime.now();
